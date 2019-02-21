@@ -42,6 +42,7 @@ using Newtonsoft.Json;
 using WIM.Exceptions.Services;
 using System.IO.Compression;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Cors;
 
 namespace WaveLabServices.Controllers
 {
@@ -84,9 +85,10 @@ namespace WaveLabServices.Controllers
                 return HandleException(ex);
             }
         }
+        [EnableCors("CorsPolicy")]
         [HttpPost]
-        [DisableFormValueModelBinding]
-        [DisableRequestSizeLimit]
+        [DisableFormValueModelBinding]        
+        [DisableRequestSizeLimit]        
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Execute([FromQuery]string format="")
         {
