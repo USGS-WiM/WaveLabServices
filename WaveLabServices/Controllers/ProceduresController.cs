@@ -6,7 +6,7 @@
 //       01234567890123456789012345678901234567890123456789012345678901234567890
 //-------+---------+---------+---------+---------+---------+---------+---------+
 
-// copyright:   2017 WiM - USGS
+// copyright:   2017 WIM - USGS
 
 //    authors:  Jeremy K. Newson USGS Web Informatics and Mapping
 //              
@@ -26,7 +26,7 @@ using WaveLabServices.Filters;
 using WaveLabServices.Resources.Helpers;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using WiM.Resources;
+using WIM.Resources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
@@ -43,10 +43,12 @@ using WIM.Exceptions.Services;
 using System.IO.Compression;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Cors;
+using WIM.Services.Attributes;
 
 namespace WaveLabServices.Controllers
 {
     [Route("[controller]")]
+    [APIDescription(type = DescriptionType.e_link, Description = "/Docs/Procedures/summary.md")]
     public class ProceduresController : WaveLabControllerBase
     {
         public IWaveLabAgent agent { get; set; }
@@ -58,7 +60,8 @@ namespace WaveLabServices.Controllers
             this._hostingEnvironment = hostingEnvironment;
         }
         #region METHODS
-        [HttpGet()]
+        [HttpGet(Name = "Available Procedures")]
+        [APIDescription(type = DescriptionType.e_link, Description = "/Docs/Procedures/AvailableProcedures.md")]
         public IActionResult Get()
         {
             //returns list of available Navigations
@@ -71,7 +74,9 @@ namespace WaveLabServices.Controllers
                 return HandleException(ex);
             }
         }
-        [HttpGet("{codeOrID}")]
+
+        [HttpGet("{codeOrID}", Name = "Procedure")]
+        [APIDescription(type = DescriptionType.e_link, Description = "/Docs/Procedures/Procedure.md")]
         public IActionResult Get(string codeOrID)
         {
             //returns list of available Navigations
@@ -85,10 +90,13 @@ namespace WaveLabServices.Controllers
                 return HandleException(ex);
             }
         }
+        //https://github.com/aspnet/AspNetCore/issues/3323
+
         [EnableCors("CorsPolicy")]
-        [HttpPost]
+        [HttpPost(Name = "Compute Procedure")]
         [DisableFormValueModelBinding]        
-        [DisableRequestSizeLimit]        
+        [DisableRequestSizeLimit]
+        [APIDescription(type = DescriptionType.e_link, Description = "/Docs/Procedures/ComputeProcedure.md")]
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Execute([FromQuery]string format="")
         {
@@ -104,10 +112,11 @@ namespace WaveLabServices.Controllers
                 
 
                 Procedure item = await this.ProcessProcedureRequestAsync(targetFilePath);
-                string resultsFilePath = agent.GetProcedureResultsFilePath(item, targetFilePath);
+                var results = agent.GetProcedureResultsFilePath(item, targetFilePath);
 
-                if (format.Contains("zip")) return getResultZipFiles(resultsFilePath);
-                else return getResultFiles(resultsFilePath);
+                if (results.Entity != null)return Ok(results.Entity);
+                if (format.Contains("zip")) return getResultZipFiles(results.workspacePath);
+                else return getResultFiles(results.workspacePath);
             }
             catch (Exception ex)
             {
@@ -136,6 +145,7 @@ namespace WaveLabServices.Controllers
 
                 var boundary = MultipartRequestHelper.GetBoundary(MediaTypeHeaderValue.Parse(Request.ContentType),
                                                                    _defaultFormOptions.MultipartBoundaryLengthLimit);
+                sm($"Boundary: {boundary}");
 
                 var reader = new MultipartReader(boundary, HttpContext.Request.Body);
                 var section = await reader.ReadNextSectionAsync();
@@ -144,13 +154,15 @@ namespace WaveLabServices.Controllers
                 {
                     ContentDispositionHeaderValue contentDisposition;
                     var hasContentDispositionHeader = ContentDispositionHeaderValue.TryParse(section.ContentDisposition, out contentDisposition);
-
+                    sm($"HasContentDispositionHeader: {hasContentDispositionHeader}");
                     if (hasContentDispositionHeader)
                     {
                         if (MultipartRequestHelper.HasFileContentDisposition(contentDisposition))
                         {
+                            sm($"HasFileDispositionHeader");
                             if (section.ContentType == "application/json")
                             {
+                                sm($"isJson");
                                 var serializer = new JsonSerializer();
 
                                 using (var sr = new StreamReader(section.Body))
@@ -160,6 +172,7 @@ namespace WaveLabServices.Controllers
                             }
                             else // is file
                             {
+                                sm($"isfile");
                                 using (var targetStream = new FileStream(Path.Combine(targetPath, contentDisposition.FileName.ToString()), FileMode.Create))
                                     await section.Body.CopyToAsync(targetStream);
 
@@ -167,6 +180,7 @@ namespace WaveLabServices.Controllers
                         }//end if
                         else if (MultipartRequestHelper.HasFormDataContentDisposition(contentDisposition))
                         {
+                            sm($"HasFormDataContentDispositionHeader");
                             // Content-Disposition: form-data; name="key"
                             // Do not limit the key name length here because the 
                             // multipart headers length limit is already in effect.

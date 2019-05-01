@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using WiM.Hypermedia;
+using WIM.Resources;
 
 namespace WaveLabAgent.Resources
 {

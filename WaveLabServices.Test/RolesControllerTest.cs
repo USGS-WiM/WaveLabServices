@@ -16,7 +16,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using WiM.Resources;
+using WIM.Resources;
 
 namespace WaveLabServices.Test
 {

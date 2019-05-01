@@ -55,7 +55,7 @@ namespace WaveLabAgent.Test
             PopulateProcedure(ref procedure);
 
             //Act
-            mock.LoadProcedureFiles(procedure, @"D:\WiM\GitHub\WaveLabServices\WaveLabAgent.Test\temp");
+            mock.GetProcedureResultsFilePath(procedure, @"D:\WiM\GitHub\WaveLabServices\WaveLabAgent.Test\temp");
             //Assert
             Assert.Equal(procedure.Name, procedure.Name);
         }
@@ -69,7 +69,7 @@ namespace WaveLabAgent.Test
             PopulateProcedure(ref procedure);
 
             //Act
-            mock.LoadProcedureFiles(procedure, @"D:\WiM\GitHub\WaveLabServices\WaveLabAgent.Test\temp");
+            mock.GetProcedureResultsFilePath(procedure, @"D:\WiM\GitHub\WaveLabServices\WaveLabAgent.Test\temp");
             //Assert
             Assert.Equal(procedure.Name, procedure.Name);
         }
@@ -82,7 +82,7 @@ namespace WaveLabAgent.Test
             var procedure = mock.GetProcedure(item.Code);
             PopulateProcedure(ref procedure);
             //Act
-            mock.LoadProcedureFiles(procedure, @"D:\WiM\GitHub\WaveLabServices\WaveLabAgent.Test\temp");
+            mock.GetProcedureResultsFilePath(procedure, @"D:\WiM\GitHub\WaveLabServices\WaveLabAgent.Test\temp");
             //Assert
             Assert.Equal(procedure.Name, procedure.Name);
         }
@@ -121,10 +121,10 @@ namespace WaveLabAgent.Test
                         {
                             case "Read":
                             case "Wave":
-                                option.Value = Convert.ToString(option.Value[4]);
+                                option.Value = Convert.ToString(option.Options[4]);
                                 break;
                             case "Barometric":
-                                option.Value = Convert.ToString(option.Value[5]);
+                                option.Value = Convert.ToString(option.Options[5]);
                                 break;
                             default:
                                 option.Value = "";
@@ -141,7 +141,7 @@ namespace WaveLabAgent.Test
                         option.Value = new double[] { 39.79728106, -84.088548 };
                         break;
                     case 7://time zone
-                        option.Value = Convert.ToString(option.Value[2]);
+                        option.Value = Convert.ToString(option.Options[2]);
                         break;
                     case 8://daylight savings?
                         option.Value = false;
@@ -153,7 +153,7 @@ namespace WaveLabAgent.Test
                         option.Value = 1;
                         break;
                     case 11://datum
-                        option.Value = Convert.ToString(option.Value[0]);
+                        option.Value = Convert.ToString(option.Options[0]);
                         break;
                     case 12://start date
                         option.Value = new DateTime(2016, 10, 8, 8, 0, 0);
@@ -162,10 +162,10 @@ namespace WaveLabAgent.Test
                         option.Value = new DateTime(2016, 10, 10, 8, 0, 0);
                         break;
                     case 14://Salinity
-                        option.Value= Convert.ToString(option.Value[0]);
+                        option.Value= Convert.ToString(option.Options[0]);
                         break;
                     case 15:// Preassure Type
-                        option.Value = Convert.ToString(option.Value[0]);
+                        option.Value = Convert.ToString(option.Options[0]);
                         break;
                     case 16://Deployment Datum tapedown distance
                         option.Value = 1;
@@ -180,7 +180,7 @@ namespace WaveLabAgent.Test
                         option.Value = new DateTime(2016, 10, 10, 0, 0, 0);
                         break;
                     case 20://Waterbody
-                        option.Value = Convert.ToString(option.Value[0]);
+                        option.Value = Convert.ToString(option.Options[0]);
                         break;
                     case 21://sensor at 4 hz
                         option.Value = true;

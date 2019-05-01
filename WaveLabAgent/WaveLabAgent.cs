@@ -6,7 +6,7 @@
 //       01234567890123456789012345678901234567890123456789012345678901234567890
 //-------+---------+---------+---------+---------+---------+---------+---------+
 
-// copyright:   2017 WiM - USGS
+// copyright:   2017 WIM - USGS
 
 //    authors:  Jeremy K. Newson USGS Web Informatics and Mapping
 //              
@@ -20,16 +20,19 @@
 // 
 
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using WaveLabAgent.Resources;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using WiM.Utilities.ServiceAgent;
+using WIM.Utilities.ServiceAgent;
 using System.IO;
 using WIM.Exceptions.Services;
 using System.Diagnostics;
+using WIM.Resources;
+using Newtonsoft.Json.Converters;
 
 namespace WaveLabAgent
 {
@@ -37,22 +40,24 @@ namespace WaveLabAgent
     {
         List<Procedure> GetAvailableProcedures();
         Procedure GetProcedure(string CodeOrID);
-        string GetProcedureResultsFilePath(Procedure selectedprocedure,string workingdirectory);
+        ProcedureResult GetProcedureResultsFilePath(Procedure selectedprocedure,string workingdirectory);
 
     }
 
     public class WaveLabAgent : ExternalProcessServiceAgentBase, IWaveLabAgent
     {
         #region Properties
+        private readonly IDictionary<Object, Object> _messages;
         private List<Procedure> availableProcedures{ get; set; }
         private List<ConfigurationOption> availableConfigurationOptions { get; set; }
         private Dictionary<string, List<int>> procedureConfigurations { get; set; }
         private Dictionary<string, string> wavelabresources { get; set; }
         #endregion
         #region Constructor
-        public WaveLabAgent(IOptions<ProcedureSettings> ProcedureSettings):
+        public WaveLabAgent(IOptions<ProcedureSettings> ProcedureSettings, IHttpContextAccessor httpContextAccessor = null) :
             base(ProcedureSettings.Value.wavelab.baseurl, null)
         {
+            _messages = httpContextAccessor?.HttpContext.Items;
             wavelabresources = ProcedureSettings.Value.wavelab.resources;
             //deep clone to ensure objects stay stateless
             availableProcedures = JsonConvert.DeserializeObject<List<Procedure>>(JsonConvert.SerializeObject(ProcedureSettings.Value.Procedures));
@@ -87,21 +92,23 @@ namespace WaveLabAgent
             return procedure;
         }
 
-        public string GetProcedureResultsFilePath(Procedure selectedprocedure,string workingdirectory)
+        public ProcedureResult GetProcedureResultsFilePath(Procedure selectedprocedure,string workingdirectory)
         {
             try
             {
-                var resultspath = Path.Combine(workingdirectory, "wavelabResults");
-                if (!Directory.Exists(resultspath))
-                    Directory.CreateDirectory(resultspath);
+
+                var results = new ProcedureResult(Path.Combine(workingdirectory, "wavelabResults"));
+                if (!Directory.Exists(results.workspacePath))
+                    Directory.CreateDirectory(results.workspacePath);
 
                 if (!isValid(selectedprocedure)) throw new BadRequestException("One or more of the procedure's configuration options are invalid");
-                execute(selectedprocedure, resultspath);
-                return resultspath;
+                results.Entity = execute(selectedprocedure, results.workspacePath);
+
+                return results;
             }
             catch (Exception)
             {
-                return string.Empty;
+                return null;
             }
         }
         #endregion
@@ -121,7 +128,7 @@ namespace WaveLabAgent
                          {
                              ID = c.ID,
                              Name = c.Name,
-                             Description = string.Format(c.Description, getConfigureationDescription(procedureCode, list.Where(d => c.ID == d).ToList().IndexOf(c.ID))),
+                             Description = string.Format(c.Description, getConfigureationDescription(procedureCode,c.ID )),
                              Required = c.Required,
                              ValueType = c.ValueType,
                              Options = c.Options,
@@ -135,7 +142,7 @@ namespace WaveLabAgent
                 throw;
             }
         }
-        private string getConfigureationDescription(string procedureCode, int count)
+        private string getConfigureationDescription(string procedureCode, int id)
         {
             string name = string.Empty;
             switch (procedureCode)
@@ -147,7 +154,7 @@ namespace WaveLabAgent
                     name = "barometric csv ";
                     break;
                 case "Wave":
-                    if (count > 1) name = "water-level csv";
+                    if (id > 1) name = "water-level csv";
                     else name = "barometric netCDF ";
                     break;
                 default:
@@ -217,7 +224,7 @@ namespace WaveLabAgent
                 return false;
             }
         }
-        private void execute(Procedure selectedProcedure, string workingdirectory)
+        private object execute(Procedure selectedProcedure, string workingdirectory)
         {
             try
             {
@@ -229,19 +236,42 @@ namespace WaveLabAgent
                 startinfo.WorkingDirectory = workingdirectory;
 
                 var response = Execute(startinfo);
-                //if (!String.IsNullOrEmpty(response.Errors)) throw new Exception("WaveLabScripts reported there was a problem " + response.Errors);
+                if (!String.IsNullOrEmpty(response?.Errors)) sm("WaveLabScripts reported there was a problem " + response.Errors, MessageType.error);
+                if (!string.IsNullOrEmpty(response?.Output))
+                    return deserializeOutput(selectedProcedure.Code, response.Output);
+
+                return null;
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
+
+        private object deserializeOutput(string procedureCode, string output)
+        {
+            switch (procedureCode)
+            {
+                case "Read":
+                    var result = JsonConvert.DeserializeObject<ReadResults>(output, new Serializers.UnixDateTimeConverter());
+                    return result.time.Zip(result.pressure, (s, i) => new { s, i }).ToDictionary(a => a.s,a=>a.i);
+                    
+                case "Barometric":
+                    break;
+                case "Wave":
+                    break;
+                default:
+                    break;
+            }
+            throw new NotImplementedException();
+        }
+
         private string getProcessName(string code)
         {
             if (!wavelabresources.ContainsKey(code)) throw new NotFoundRequestException(code + " process resource does not exist.");
             string resource = wavelabresources[code];
             // Path.GetFileNameWithoutExtension(resource),
-            return Path.Combine(new String[] { AppContext.BaseDirectory, "Assets", "Scripts", resource });
+            return Path.Combine(new String[] { AppContext.BaseDirectory, "Assets", "ScriptsV2", resource });
         }
         private string getRequestArguments(string procedureCode, List<ConfigurationOption> options)
         {
@@ -252,7 +282,7 @@ namespace WaveLabAgent
                 {
                     var item = options.Find(o => o.ID == identifier);
                     //input files up one directory level
-                    if (item.ID == 1) item.Value = Path.Combine("..", item.Value);
+                    if (item.ID == 1 || item.ID==22) item.Value = Path.Combine("..", item.Value);
                     if (item.Required && item.Value == null) throw new BadRequestException(item.Name+" is required.");
                     if (item.Value == null) item.Value = getOptionsDefaultValue(procedureCode, item.ID);
                     arguments.AddRange(getOptionValue(item));
@@ -336,6 +366,27 @@ namespace WaveLabAgent
                 default:
                     return false;
             }
+        }
+        private void sm(string msg, MessageType type = MessageType.info)
+        {
+            sm(new Message() { msg = msg, type = type });
+        }
+        private void sm(Message msg)
+        {
+            //wim_msgs comes from WIM.Standard/blob/staging/Services/Middleware/X-Messages.cs
+            //manually added to avoid including libr in project.
+            if (this._messages == null) return;
+            if (!this._messages.ContainsKey("wim_msgs"))
+                this._messages["wim_msgs"] = new List<Message>();
+
+            ((List<Message>)this._messages["wim_msgs"]).Add(msg);
+        }
+
+        private struct ReadResults
+        {
+            public DateTime[] time { get; set; }
+            public double[] pressure { get; set; }
+           
         }
     }
     #endregion

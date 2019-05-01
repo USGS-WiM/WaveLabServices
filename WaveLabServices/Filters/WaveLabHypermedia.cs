@@ -6,7 +6,7 @@
 //       01234567890123456789012345678901234567890123456789012345678901234567890
 //-------+---------+---------+---------+---------+---------+---------+---------+
 
-// copyright:   2017 WiM - USGS
+// copyright:   2017 WIM - USGS
 
 //    authors:  Jeremy K. Newson USGS Web Informatics and Mapping
 //              
@@ -21,8 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WiM.Hypermedia;
-using WiM.Services.Filters;
+using WIM.Hypermedia;
+using WIM.Resources;
+using WIM.Services.Filters;
 
 namespace WaveLabServices.Filters
 {
@@ -35,7 +36,7 @@ namespace WaveLabServices.Filters
             {
                 case "WaveLab":
                     results = new List<Link>();
-                    results.Add(new Link(BaseURI, "self by id", this.URLQuery +"/", WiM.Resources.refType.GET));
+                    results.Add(Hyperlinks.Generate(BaseURI, "self by id", this.URLQuery +"/", WIM.Resources.refType.GET));
                     break;
 
                 default:
@@ -53,7 +54,7 @@ namespace WaveLabServices.Filters
             {
                 case "WaveLab":
                     results = new List<Link>();
-                    results.Add(new Link(BaseURI, "wavelab example", this.URLQuery + "/", WiM.Resources.refType.POST));
+                    results.Add(Hyperlinks.Generate(BaseURI, "wavelab example", this.URLQuery + "/", WIM.Resources.refType.POST));
 
                     break;                
                 default:

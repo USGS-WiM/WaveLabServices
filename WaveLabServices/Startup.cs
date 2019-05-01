@@ -6,17 +6,19 @@ using Microsoft.Extensions.Logging;
 using WaveLabAgent;
 using WaveLabAgent.Resources;
 using Microsoft.AspNetCore.Mvc;
-using WiM.Services.Middleware;
-using WiM.Services.Analytics;
-using WiM.Utilities.ServiceAgent;
-using WiM.Services.Resources;
+using WIM.Services.Middleware;
+using WIM.Services.Analytics;
+using WIM.Utilities.ServiceAgent;
+using WIM.Services.Resources;
 using WaveLabServices.Filters;
 using Microsoft.AspNetCore.Http.Features;
+using WIM.Services.Messaging;
 
 namespace WaveLabServices
 {
     public class Startup
     {
+        private string _hostKey = "USGSWiM_HostName";
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -44,6 +46,9 @@ namespace WaveLabServices
             //Configure injectable obj
             services.Configure<APIConfigSettings>(Configuration.GetSection("APIConfigSettings"));
             services.Configure<ProcedureSettings>(Configuration.GetSection("ProcedureSettings"));
+            
+            //provides access to httpcontext
+            services.AddHttpContextAccessor();
 
             // Add framework services
             services.AddScoped<IWaveLabAgent, WaveLabAgent.WaveLabAgent>();
@@ -54,6 +59,7 @@ namespace WaveLabServices
                 options.AddPolicy("CorsPolicy", builder => builder.AllowAnyOrigin()
                                                                  .AllowAnyMethod()
                                                                  .AllowAnyHeader()
+                                                                 .WithExposedHeaders(new string[] { this._hostKey, X_MessagesDefault.msgheader })
                                                                  .AllowCredentials());
             });
             services.Configure<FormOptions>(x =>
@@ -73,10 +79,9 @@ namespace WaveLabServices
         // Method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-
+            app.UseX_Messages(option => { option.HostKey = this._hostKey; });
             app.UseCors("CorsPolicy");
             app.Use_Analytics();
-            app.UseX_Messages();
             app.UseMvc();            
         }
 

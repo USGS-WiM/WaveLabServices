@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using WiM.Utilities.Resources;
+using WIM.Utilities.Resources;
 
 namespace WaveLabAgent.Resources
 {
