@@ -106,9 +106,9 @@ namespace WaveLabAgent
 
                 return results;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                throw ex;
             }
         }
         #endregion
@@ -184,6 +184,7 @@ namespace WaveLabAgent
                 switch (configOpt.ValueType)
                 {
                     case "string":
+                    case "writein-option":
                         if (selectedOption.Value is string && !string.IsNullOrEmpty(selectedOption.Value))
                             validity = true;
                         break;
@@ -216,11 +217,12 @@ namespace WaveLabAgent
                         validity = false;
                         break;
                 }
-
+                if (!validity) sm($"{selectedOption.Name} contains an invalid value. {selectedOption.Value}",MessageType.warning);
                 return validity;
             }
             catch (Exception ex)
             {
+                sm($"{selectedOption.Name} failed to validate", MessageType.error);
                 return false;
             }
         }

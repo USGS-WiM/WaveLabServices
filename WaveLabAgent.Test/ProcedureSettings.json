@@ -1,276 +1,285 @@
 {
-    "wavelab": {
-      "baseurl": "",
-      "resources": {
-        "Read": "stn_script_getchop.exe",
-        "Barometric": "stn_script_air.exe",
-        "Wave": "stn_script.exe"
-      }
+  "wavelab": {
+    "baseurl": "",
+    "resources": {
+      "Read": "stn_script_getchop.exe",
+      "Barometric": "stn_script_air.exe",
+      "Wave": "stn_script.exe"
+    }
+  },
+  "Procedures": [
+    {
+      "ID": 1,
+      "Code": "Read",
+      "Name": "Read file",
+      "Description": "Ingests csv file and returns a time series used for selecting a date range for barometric and water-level scripts. [good_start_date, good_end_date],  This is run before processing barometric files and water-level files."
     },
-    "Procedures": [
-      {
-        "ID": 1,
-        "Code": "Read",
-        "Name": "Read file",
-        "Description": "Ingests csv file and returns a time series used for selecting a date range for barometric and water-level scripts. [good_start_date, good_end_date],  This is run before processing barometric files and water-level files."
-      },
-      {
-        "ID": 2,
-        "Code": "Barometric",
-        "Name": "Atmospheric pressure",
-        "Description": "Ingests an atmospheric pressure csv file and returns a netCDF file and barometer graphic"
-      },
-      {
-        "ID": 4,
-        "Code": "Wave",
-        "Name": "Wave and water-level",
-        "Description": "Ingests an atmospheric pressure csv file and returns a netCDF file and barometer graphic"
-      }
-    ],
-    "ProcedureConfigurations": {
-      "Read": [ 1, 2, 15, 7, 8, 11, 3 ],
-      "Barometric": [ 1, 2, 3, 4, 5, 6, 7, 8, 11, 9, 10, 12, 13 ],
-      "Wave": [ 1, 1, 2, 3, 4, 5, 6, 7, 8, 11, 9, 10, 14, 16, 17, 18, 19, 20, 12, 13, 21 ]
+    {
+      "ID": 2,
+      "Code": "Barometric",
+      "Name": "Atmospheric pressure",
+      "Description": "Ingests an atmospheric pressure csv file and returns a netCDF file and barometer graphic"
     },
-    "Configurations": [
-      {
-        "ID": 1,
-        "Name": "Input File Name",
-        "Required": true,
-        "Description": "Name of {0}file",
-        "ValueType": "string",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 2,
-        "Name": "Output file Name",
-        "Required": false,
-        "Description": "Name of output file",
-        "ValueType": "string",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 3,
-        "Name": "Instrument Type",
-        "Required": true,
-        "Description": "Name of instrument file is from.",
-        "ValueType": "option",
-        "Options": [
-          "Level Troll",
-          "RBR Solo",
-          "Wave Guage",
-          "USGS Homemade",
-          "Measurement Specialties",
-          "Hobo"
-        ],
-        "Value" : null
-      },
-      {
-        "ID": 4,
-        "Name": "Site Identifier",
-        "Required": true,
-        "Description": "Unique site identifier.",
-        "ValueType": "string",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 5,
-        "Name": "Instrument Identifier",
-        "Required": true,
-        "Description": "Unique instrument identifier.",
-        "ValueType": "string",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 6,
-        "Name": "Location",
-        "Required": true,
-        "Description": "Location (lat/long) coordinates in Decimal Degrees",
-        "ValueType": "coordinates array",
-        "Options": null,
-        "Value": "[ 39.79728106, -84.088548 ]"
-      },
-      {
-        "ID": 7,
-        "Name": "Time Zone",
-        "Required": true,
-        "Description": "Unique site identifier.",
-        "ValueType": "option",
-        "Options": [
-          "GMT",
-          "US/Aleutian",
-          "US/Central",
-          "US/Eastern",
-          "US/Hawaii",
-          "US/Mountain",
-          "US/Pacific"
-        ],
-        "Value": null
-      },
-      {
-        "ID": 8,
-        "Name": "Day Light Savings?",
-        "Required": true,
-        "Description": "Flag to indicate if file need to be adjusted for daylight savings time?",
-        "ValueType": "bool",
-        "Options": null,
-        "Value": "false"
-      },
-      {
-        "ID": 9,
-        "Name": "Deployment Distance",
-        "Required": true,
-        "Description": "Initial Sensor orifice elevation below the datum at deployment time (in feet).",
-        "ValueType": "numeric",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 10,
-        "Name": "Retrieval Distance",
-        "Required": true,
-        "Description": "Final Sensor orifice elevation below the datum at deployment time (in feet).",
-        "ValueType": "numeric",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 11,
-        "Name": "Datum",
-        "Required": true,
-        "Description": "Datum",
-        "ValueType": "option",
-        "Options": [
-          "NAVD88",
-          "NGVD29",
-          "Above Ground Level",
-          "Local Control Point"
-        ],
-        "Value": null
-      },
-      {
-        "ID": 12,
-        "Name": "Start Date",
-        "Required": true,
-        "Description": "start date at which procedure will process the file",
-        "ValueType": "date",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 13,
-        "Name": "End Date",
-        "Required": true,
-        "Description": "start date at which procedure will process the file",
-        "ValueType": "date",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 14,
-        "Name": "Salinity",
-        "Required": true,
-        "Description": "Water salinity of deployed sensor.",
-        "ValueType": "option",
-        "Options": [
-          "Salt Water (> 30 ppt)",
-          "Brackish Water (.5 - 30 ppt)",
-          "Fresh Water (< .5 ppt)"
-        ],
-        "Value": null
-      },
-      {
-        "ID": 15,
-        "Name": "Pressure Type",
-        "Required": true,
-        "Description": "Type of pressure file.",
-        "ValueType": "option",
-        "Options": [
-          "Sea Pressure",
-          "Air Pressure"
-        ],
-        "Value": null
+    {
+      "ID": 4,
+      "Code": "Wave",
+      "Name": "Wave and water-level",
+      "Description": "Ingests a water level csv file and barometric pressure netCDF file and returns a stormtide graphic."
+    }
+  ],
+  "ProcedureConfigurations": {
+    "Read": [ 1, 2, 15, 7, 8, 11, 3 ],
+    "Barometric": [ 1, 2, 3, 4, 5, 6, 7, 8, 11, 9, 10, 12, 13 ],
+    "Wave": [ 1, 22, 2, 3, 4, 5, 6, 7, 8, 11, 9, 10, 14, 16, 17, 18, 19, 20, 12, 13, 21 ]
+  },
+  "Configurations": [
+    {
+      "ID": 1,
+      "Name": "Input File Name",
+      "Required": true,
+      "Description": "Name of {0} file",
+      "ValueType": "string",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 22,
+      "Name": "Input File Name",
+      "Required": true,
+      "Description": "Name of {0} file",
+      "ValueType": "string",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 2,
+      "Name": "Output file Name",
+      "Required": false,
+      "Description": "Name of output file",
+      "ValueType": "string",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 3,
+      "Name": "Instrument Type",
+      "Required": true,
+      "Description": "Name of instrument file is from.",
+      "ValueType": "option",
+      "Options": [
+        "Level Troll",
+        "RBR Solo",
+        "Wave Guage",
+        "USGS Homemade",
+        "Measurement Specialties",
+        "Hobo"
+      ],
+      "Value": null
+    },
+    {
+      "ID": 4,
+      "Name": "Site Identifier",
+      "Required": true,
+      "Description": "Unique site identifier.",
+      "ValueType": "string",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 5,
+      "Name": "Instrument Identifier",
+      "Required": true,
+      "Description": "Unique instrument identifier.",
+      "ValueType": "string",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 6,
+      "Name": "Location",
+      "Required": true,
+      "Description": "Location (lat/long) coordinates in Decimal Degrees",
+      "ValueType": "coordinates array",
+      "Options": null,
+      "Value": "[ 39.79728106, -84.088548 ]"
+    },
+    {
+      "ID": 7,
+      "Name": "Time Zone",
+      "Required": true,
+      "Description": "Unique site identifier.",
+      "ValueType": "option",
+      "Options": [
+        "GMT",
+        "US/Aleutian",
+        "US/Central",
+        "US/Eastern",
+        "US/Hawaii",
+        "US/Mountain",
+        "US/Pacific"
+      ],
+      "Value": null
+    },
+    {
+      "ID": 8,
+      "Name": "Day Light Savings?",
+      "Required": true,
+      "Description": "Flag to indicate if file need to be adjusted for daylight savings time?",
+      "ValueType": "bool",
+      "Options": null,
+      "Value": "false"
+    },
+    {
+      "ID": 9,
+      "Name": "Deployment Distance",
+      "Required": true,
+      "Description": "Initial Sensor orifice elevation below the datum at deployment time (in feet).",
+      "ValueType": "numeric",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 10,
+      "Name": "Retrieval Distance",
+      "Required": true,
+      "Description": "Final Sensor orifice elevation below the datum at deployment time (in feet).",
+      "ValueType": "numeric",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 11,
+      "Name": "Datum",
+      "Required": true,
+      "Description": "Datum",
+      "ValueType": "option",
+      "Options": [
+        "NAVD88",
+        "NGVD29",
+        "Above Ground Level",
+        "Local Control Point"
+      ],
+      "Value": null
+    },
+    {
+      "ID": 12,
+      "Name": "Start Date",
+      "Required": true,
+      "Description": "start date at which procedure will process the file",
+      "ValueType": "date",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 13,
+      "Name": "End Date",
+      "Required": true,
+      "Description": "start date at which procedure will process the file",
+      "ValueType": "date",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 14,
+      "Name": "Salinity",
+      "Required": true,
+      "Description": "Water salinity of deployed sensor.",
+      "ValueType": "option",
+      "Options": [
+        "Salt Water (> 30 ppt)",
+        "Brackish Water (.5 - 30 ppt)",
+        "Fresh Water (< .5 ppt)"
+      ],
+      "Value": null
+    },
+    {
+      "ID": 15,
+      "Name": "Pressure Type",
+      "Required": true,
+      "Description": "Type of pressure file.",
+      "ValueType": "option",
+      "Options": [
+        "Sea Pressure",
+        "Air Pressure"
+      ],
+      "Value": null
 
-      },
-      {
-        "ID": 16,
-        "Name": "Deployment Datum Tapedown Distance",
-        "Required": true,
-        "Description": "Initial measurement from datum to ground (in feet).",
-        "ValueType": "numeric",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 17,
-        "Name": "Retrieval Datum Tapedown Distance",
-        "Required": true,
-        "Description": "Final measurement from datum to ground (in feet).",
-        "ValueType": "numeric",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 18,
-        "Name": "Date Deployed",
-        "Required": true,
-        "Description": "Date deployed",
-        "ValueType": "date",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 19,
-        "Name": "Date Retrieved",
-        "Required": true,
-        "Description": "Date retrieved",
-        "ValueType": "date",
-        "Options": null,
-        "Value": null
-      },
-      {
-        "ID": 20,
-        "Name": "Waterbody",
-        "Required": true,
-        "Description": "Deployment Waterbody",
-        "ValueType": "option",
-        "Options": [
-          "Chesapeake Bay",
-          "Great Lakes",
-          "Gulf of Alaska",
-          "Gulf of California",
-          "Gulf of Maine",
-          "Gulf of Mexico",
-          "Hudson Bay",
-          "Massachusetts Bay",
-          "NE Atlantic (limit-40 W)",
-          "NE Pacific (limit-180)",
-          "North American Coastline-North",
-          "North American Coastline-South",
-          "North Atlantic Ocean",
-          "North Pacific Ocean",
-          "NW Atlantic (limit-40 W)",
-          "NW Pacific (limit-180)",
-          "SE Atlantic (limit-20 W)",
-          "SE Pacific (limit-140 W)",
-          "SW Atlantic (limit-20 W)",
-          "SW Pacific (limit-147 E to 140 W)"
-        ],
-        "Value": null
-      },
-      {
-        "ID": 21,
-        "Name": "Sensor Measured at 4hz",
-        "Required": true,
-        "Description": "Flag indicating sensor measurement was at 4 hz.",
-        "ValueType": "bool",
-        "Options": null,
-        "Value": "true"
-      }
-    ]
-  }
+    },
+    {
+      "ID": 16,
+      "Name": "Deployment Datum Tapedown Distance",
+      "Required": true,
+      "Description": "Initial land ground elevation (in feet).",
+      "ValueType": "numeric",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 17,
+      "Name": "Retrieval Datum Tapedown Distance",
+      "Required": true,
+      "Description": "Final land ground elevation (in feet).",
+      "ValueType": "numeric",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 18,
+      "Name": "Date Deployed",
+      "Required": true,
+      "Description": "Date deployed",
+      "ValueType": "date",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 19,
+      "Name": "Date Retrieved",
+      "Required": true,
+      "Description": "Date retrieved",
+      "ValueType": "date",
+      "Options": null,
+      "Value": null
+    },
+    {
+      "ID": 20,
+      "Name": "Waterbody",
+      "Required": true,
+      "Description": "Deployment Waterbody",
+      "ValueType": "writein-option",
+      "Options": [
+        "Chesapeake Bay",
+        "Great Lakes",
+        "Gulf of Alaska",
+        "Gulf of California",
+        "Gulf of Maine",
+        "Gulf of Mexico",
+        "Hudson Bay",
+        "Massachusetts Bay",
+        "NE Atlantic (limit-40 W)",
+        "NE Pacific (limit-180)",
+        "North American Coastline-North",
+        "North American Coastline-South",
+        "North Atlantic Ocean",
+        "North Pacific Ocean",
+        "NW Atlantic (limit-40 W)",
+        "NW Pacific (limit-180)",
+        "SE Atlantic (limit-20 W)",
+        "SE Pacific (limit-140 W)",
+        "SW Atlantic (limit-20 W)",
+        "SW Pacific (limit-147 E to 140 W)"
+      ],
+      "Value": null
+    },
+    {
+      "ID": 21,
+      "Name": "Sensor Measured at 4hz",
+      "Required": true,
+      "Description": "Flag indicating sensor measurement was at 4 hz.",
+      "ValueType": "bool",
+      "Options": null,
+      "Value": "true"
+    }
+  ]
+}
 

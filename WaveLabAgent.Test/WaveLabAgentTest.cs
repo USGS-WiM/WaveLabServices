@@ -105,13 +105,15 @@ namespace WaveLabAgent.Test
                                 option.Value = "NCCAR12248_9983816_air.csv";
                                 break;
                             case "Wave":
-                                if (i > 0) option.Value = "NCCAR12248_9983816_air.nc";
-                                else option.Value = "NCCAR00007_1511451_sea.csv";
+                                option.Value = "NCCAR12248_9983816_air.nc";                                
                                 break;
                             default:
                                 option.Value = "";
                                 break;
                         }
+                        break;
+                    case 22: //inputfile
+                        option.Value = "NCCAR00007_1511451_sea.csv";
                         break;
                     case 2://outputfile
                         option.Value = "output";
@@ -180,7 +182,7 @@ namespace WaveLabAgent.Test
                         option.Value = new DateTime(2016, 10, 10, 0, 0, 0);
                         break;
                     case 20://Waterbody
-                        option.Value = Convert.ToString(option.Options[0]);
+                        option.Value = "test waterbody";//Convert.ToString(option.Options[0]);
                         break;
                     case 21://sensor at 4 hz
                         option.Value = true;
