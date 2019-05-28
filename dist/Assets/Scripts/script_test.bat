@@ -1,0 +1,3 @@
+"./stn_script/stn_script.exe" "C:\Users\gpetrochenkov\Documents\Input\NCCAR00007_1511451_sea.csv" "C:\Users\gpetrochenkov\Documents\Input\NCCAR12248_9983816_air.csv.nc" "C:\Users\gpetrochenkov\Documents\Output\output" "Greg P" stuff@gmail.com ^
+zombo.com "Measurement Specialties" 1 2 40.0 50.0 US/Central False NAVD88 1 1 "Salt Water (^> 30 ppt)" ^
+1 1.2 "20151002 0000" "20151010 0000" "Chesapeake Bay" "20161008 0800" "20161010 0800"  True

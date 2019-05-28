@@ -1,0 +1,2 @@
+"./stn_script_getchop/stn_script_getchop.exe" "C:\Users\gpetrochenkov\Documents\Input\NCCAR00007_1511451_sea.csv" "C:\Users\gpetrochenkov\Documents\Output\output" ^
+"Sea Pressure" US/Central False NAVD88 "Measurement Specialties"

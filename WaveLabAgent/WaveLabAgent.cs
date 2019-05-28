@@ -273,7 +273,7 @@ namespace WaveLabAgent
             if (!wavelabresources.ContainsKey(code)) throw new NotFoundRequestException(code + " process resource does not exist.");
             string resource = wavelabresources[code];
             // Path.GetFileNameWithoutExtension(resource),
-            return Path.Combine(new String[] { AppContext.BaseDirectory, "Assets", "ScriptsV2", resource });
+            return Path.Combine(new String[] { AppContext.BaseDirectory, "Assets", "Scripts", resource });
         }
         private string getRequestArguments(string procedureCode, List<ConfigurationOption> options)
         {
