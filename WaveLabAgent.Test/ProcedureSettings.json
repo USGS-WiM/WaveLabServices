@@ -152,7 +152,7 @@
       "Name": "Datum",
       "Required": true,
       "Description": "Datum",
-      "ValueType": "option",
+      "ValueType": "writein-option",
       "Options": [
         "NAVD88",
         "NGVD29",
