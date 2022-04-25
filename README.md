@@ -40,6 +40,7 @@ see [link](https://docs.microsoft.com/en-us/aspnet/core/publishing/iis?tabs=aspn
 
 * Download and install [windows server hosting bundle](https://www.microsoft.com/net/download/core#/runtime) on the server.
 * Create new application pool specifying the .netCLR version property to "No Managed Code".
+* Update Load User Profile setting on IIS [link](https://cypressnorth.com/web-programming-and-development/solved-using-memory-repository-keys-will-not-persisted-storage-asp-net-core-iis/)
 
 ## Deployment on Linux
 
@@ -47,7 +48,7 @@ see [link](https://docs.microsoft.com/en-us/aspnet/core/publishing/apache-proxy)
 
 ## Built With
 
-* [Dotnetcore 2.1](https://github.com/dotnet/core) - ASP.Net core Framework
+* [Dotnetcore 2.2](https://github.com/dotnet/core) - ASP.Net core Framework
 
 ## Contributing
 
